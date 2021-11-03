@@ -15,9 +15,21 @@ class App extends Component {
       base64Data: null
   };
 
+  // shouldComponentUpdate(nextProps,nextState) {
+  //   // Rendering the component only if 
+  //   // passed props value is changed
   
+  //   if (nextState.selectedFile !== this.state.selectedFile) {
+  //     return true;
+  //   } else {
+  //       return false;
+  //   }
+  // }
+
   encodeImageFileAsURL = () => {
 
+    console.log('Attempt')
+    
     function getBase64(file, onLoadCallback) {
       return new Promise(function(resolve, reject) {
           var reader = new FileReader();
@@ -26,50 +38,28 @@ class App extends Component {
           reader.readAsDataURL(file);
       });
   }
-    if (this.state.selectedFile) {
+  if(this.state.selectedFile){
+      console.log(this.state.selectedFile)
       var promise = getBase64(this.state.selectedFile);
-      promise.then(result=>this.setState({base64Data:result,selectedFile:null})
-      );
+      promise.then(data=>data.replace(/^data:image\/[a-z]+;base64,/, ""))
+      .then(result=>{
+        this.setState({selectedFile:null,base64Data:result});
+      console.log("SET STATE");
+      console.log(this.state.base64Data);
+      if(this.state.selectedFile){
+      app.models.predict('f76196b43bbd45c99b4f3cd8e8b40a8a', this.state.base64Data)
+      .then(result => {
+        console.log(result.outputs[0].data);
+      })
+        .catch(error => console.log('error', error));
+    }   
+      }
+      )
     }
-    if(this.state.base64Data){console.log(this.state.base64Data);}
-  }
+    
+  
 
-    handleApiCall = () => {
-      if(this.state.base64Data){
-      const raw = JSON.stringify({
-        "user_app_id": {
-          "user_id": "er1pq34lbyad",
-          "app_id": "test-react"
-      },
-        "inputs": [
-          {
-            "data": {
-              "image": {
-                "base64": this.state.base64Data
-              }
-            }
-          }
-        ]
-      });
-      
-      //if(this.state.base64Data){console.log(this.state.base64Data);}
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Authorization': '3b491503921247e8b965300f384d2118'
-          },
-          body: raw
-        };
-        
-          app.models.predict('aaa03c23b3724a16a56b629203edc62c', requestOptions)
-  .then(response => response.text())
-          .then(result => {
-            console.log(JSON.parse(result, null, 2).outputs[0].data);
-            //this.setState({base64Data:null})
-          })
-            .catch(error => console.log('error', error));
-        }
+     
     }
      
     // On file select (from the pop up) 
@@ -95,7 +85,6 @@ class App extends Component {
                 </button>  */}
           </div>
           {this.encodeImageFileAsURL()}
-          {/* {this.handleApiCall()} */}
         </div> 
       ); 
     } 
