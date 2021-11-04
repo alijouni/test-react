@@ -35,9 +35,7 @@ class App extends Component {
         </h3>
         <div>
           <input type="file" onChange={this.onFileChange} />
-          {/* <button onClick={this.onFileUpload}> 
-                  Upload! 
-                </button>  */}
+        
         </div>
         <EncodeImage
           selectedFile={this.state.selectedFile}
